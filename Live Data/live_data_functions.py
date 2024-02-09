@@ -9,6 +9,8 @@ import os
 import re
 import json
 
+# creates a json with portfolio details
+
 def create_portfolio(investment: float, start_date: str, end_date: str,  
            assets: list, weights: list):
     """
@@ -33,7 +35,6 @@ def create_portfolio(investment: float, start_date: str, end_date: str,
             "weights": weights}
     """
 
-
     Portfolio = {
                 "investment": investment,
                 "start_date": start_date,
@@ -42,9 +43,6 @@ def create_portfolio(investment: float, start_date: str, end_date: str,
                 "weights": weights}
 
 
-    # Count the number of files in the directory
-    import os
-    import json
 
     # Count the number of files in the directory
     path = 'c:/Users/olive/OneDrive - The University of Nottingham/Year 3/Group Project/Portfolio-Optimisation/Live Data/Portfolios'
@@ -59,7 +57,8 @@ def create_portfolio(investment: float, start_date: str, end_date: str,
 
 
 
-
+# reads the most recent portfolio from the json
+        
 def get_recent_portfolio() -> dict:
     """
     Reads the most recent JSON file in the directory and returns the portfolio.
@@ -81,7 +80,7 @@ def get_recent_portfolio() -> dict:
 
 
 
-
+# downloads the data from the Yahoo Finance API accounding to the portfolio details
 
 def download_data(Portfolio: dict) -> pd.DataFrame:
 
@@ -126,3 +125,59 @@ def download_data(Portfolio: dict) -> pd.DataFrame:
          
 
     return data
+
+
+# creates a json with portfolio details, returns the updated portfolio details after running the portfolio
+
+def create_and_test_portfolio(investment: float, start_date: str, end_date: str,  
+           assets: list, weights: list):
+    """
+    Reads most recent JSON to find the most recent date and investment amount.
+    Saves the inputs as a JSON object, each json numbered sequentially.
+
+    Args:
+        investment (float): The amount of investment.
+        start_date (str): The start date of the portfolio.
+        end_date (str): The end date of the portfolio.
+        assets (list): List of asset names.
+        weights (list): List of corresponding asset weights.
+
+    Returns:
+        None
+        JSON saved as follows:
+        {
+            "investment": investment,
+            "start_date": start_date,
+            "end_date": end_date,
+            "assets": assets,
+            "weights": weights,
+            cum_returns: cum_returns,
+            investment_end: investment_end}
+    """
+
+    Portfolio = {
+            "investment": investment,
+            "start_date": start_date,
+            "end_date": end_date,
+            "assets": assets,
+            "weights": weights}
+
+    #downloading data and running at current weights
+    df = download_data(Portfolio)
+    cum_returns = df['Portfolio Cumulative Returns'][-1]
+    investment_end = df['Portfolio Value'][-1]
+
+    # Saving cumulative returns and investment_end to the Portfolio dictionary
+    Portfolio['cum_returns'] = cum_returns
+    Portfolio['investment_end'] = investment_end
+
+    # updating the JSON file
+
+    # Count the number of files in the directory
+    path = 'c:/Users/olive/OneDrive - The University of Nottingham/Year 3/Group Project/Portfolio-Optimisation/Live Data/Portfolios'
+    files = os.listdir(path)
+    json_files = [f for f in files if f.endswith('.json')]
+
+    # Save the portfolio as a JSON file
+    with open(f'Portfolios/portfolio_{len(json_files) + 1}.json', 'w') as f:
+        json.dump(Portfolio, f)
