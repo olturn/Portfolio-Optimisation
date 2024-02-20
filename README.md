@@ -1,2 +1,2 @@
-# Portfolio-Optimisation
+# Portfolio-Optimisation project
 For maths group project
