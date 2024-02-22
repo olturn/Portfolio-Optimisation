@@ -1,64 +1,66 @@
-# Import required libraries
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
-import numpy as np
+# import your data handling libraries (e.g., pandas)
 
-# Initialize the Dash app
 app = dash.Dash(__name__)
 
-# Define the app layout
-app.layout = html.Div([
-    html.H1("Dashboard with Expected Return Input"),
-    dcc.Slider(
-        id='expected-return-slider',
-        min=0,
-        max=20,
-        step=0.5,
-        value=10,
-        marks={i: str(i) for i in range(0, 21, 2)},
+app.layout = html.Div(style={'backgroundColor': '#1e2130'}, children=[
+    html.H1(
+        "DASH - STOCK PRICES",
+        style={'textAlign': 'center', 'color': '#FFF'}
     ),
-    html.Div(id='slider-output-container'),
-    dcc.Graph(id='line-chart'),
-    dcc.Graph(id='bar-chart'),
-    dcc.Graph(id='scatter-plot'),
-    dcc.Graph(id='pie-chart'),
+    html.P(
+        "Visualising time series with Plotly - Dash.",
+        style={'textAlign': 'center', 'color': '#FFF'}
+    ),
+    html.Div([
+        dcc.Dropdown(
+            id='stock-selector',
+            options=[{'label': stock, 'value': stock} for stock in ['AAPL', 'IBM']],
+            value=['AAPL', 'IBM'],
+            multi=True,
+            style={'backgroundColor': '#333', 'color': '#FFF'}
+        ),
+    ], style={'padding': '20px', 'width': '30%', 'display': 'inline-block'}),
+    html.Div([
+        dcc.Graph(id='stock-prices-chart'),
+        dcc.Graph(id='daily-change-chart')
+    ], style={'color': '#FFF'})
 ])
 
-# Callback to update slider output
+# Define callback to update the stock price graph
 @app.callback(
-    Output('slider-output-container', 'children'),
-    [Input('expected-return-slider', 'value')])
-def update_output(value):
-    return f'Expected Return: {value}%'
+    Output('stock-prices-chart', 'figure'),
+    [Input('stock-selector', 'value')]
+)
+def update_stock_prices_chart(selected_stocks):
+    # Placeholder for the actual data updating logic
+    # You would get your stock data here and create the plotly figures
+    # For demonstration, here's a basic graph object
+    figure = go.Figure()
+    figure.update_layout(
+        plot_bgcolor='#1e2130',
+        paper_bgcolor='#1e2130',
+        font=dict(color='#FFF')
+    )
+    return figure
 
-# Callbacks to update charts based on the slider input
+# Define callback to update the daily change graph
 @app.callback(
-    [Output('line-chart', 'figure'),
-     Output('bar-chart', 'figure'),
-     Output('scatter-plot', 'figure'),
-     Output('pie-chart', 'figure')],
-    [Input('expected-return-slider', 'value')])
-def update_charts(expected_return):
-    # Generate sample data for charts
-    x = np.arange(10)
-    y = np.random.rand(10) * expected_return
+    Output('daily-change-chart', 'figure'),
+    [Input('stock-selector', 'value')]
+)
+def update_daily_change_chart(selected_stocks):
+    # Placeholder for the actual data updating logic
+    figure = go.Figure()
+    figure.update_layout(
+        plot_bgcolor='#1e2130',
+        paper_bgcolor='#1e2130',
+        font=dict(color='#FFF')
+    )
+    return figure
 
-    # Line Chart
-    line_chart = go.Figure(data=go.Scatter(x=x, y=y, mode='lines+markers'))
-
-    # Bar Chart
-    bar_chart = go.Figure(data=go.Bar(x=x, y=y))
-
-    # Scatter Plot
-    scatter_plot = go.Figure(data=go.Scatter(x=x, y=y, mode='markers'))
-
-    # Pie Chart - Just a placeholder for demonstration
-    pie_chart = go.Figure(data=go.Pie(labels=['A', 'B', 'C', 'D'], values=y[:4]))
-
-    return line_chart, bar_chart, scatter_plot, pie_chart
-
-# Run the app
 if __name__ == '__main__':
     app.run_server(debug=True)
