@@ -11,6 +11,8 @@ import json
 
 # creates a json with portfolio details
 
+
+
 def create_portfolio(investment: float, start_date: str, end_date: str,  
            assets: list, weights: list):
     """
