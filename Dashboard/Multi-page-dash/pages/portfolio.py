@@ -221,9 +221,7 @@ def update_weightings_graph(selected_date):
     xaxis_title='Stock',
     yaxis_title='Weighting',
     yaxis=dict(tickformat='.0%'),
-    autosize=False,
-    width=800,
-    height=600,
+    autosize=True,
     margin=dict(l=50, r=50, t=50, b=100),  # Adjust margins to ensure labels fit
     xaxis_tickangle=-45
 )
