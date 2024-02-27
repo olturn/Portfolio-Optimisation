@@ -7,6 +7,14 @@ from app_instance import app  # Import the Dash app instance
 from datetime import date
 import numpy as np
 from dash import dash_table
+import plotly.graph_objects as go
+
+#styles
+negative_style = {"color": "#ff0000"} #red
+positive_style = {"color": "#00ff00"} #green
+
+
+
 
 # Sample data: stocks and their weightings
 dates = pd.date_range(start='2017-01-01', periods=60, freq='ME')
@@ -62,6 +70,81 @@ df['date'] = pd.to_datetime(df['date'])
 min_date = df['date'].min()
 max_date = df['date'].max()
 
+
+#summary stats colummn
+
+indicators_ptf = go.Figure()
+indicators_ptf.add_trace(go.Indicator(
+    mode = "number+delta",
+    value = 0.15,
+    number = {'suffix': " %"},
+    title = {"text": "<br><span style='font-size:0.7em;color:gray'>7 Days</span>"},
+    delta = {'position': "bottom", 'reference': 0.2, 'relative': False},
+    domain = {'row': 0, 'column': 0}))
+
+indicators_ptf.add_trace(go.Indicator(
+    mode = "number+delta",
+    value = 0.2,
+    number = {'suffix': " %"},
+    title = {"text": "<span style='font-size:0.7em;color:gray'>15 Days</span>"},
+    delta = {'position': "bottom", 'reference': 0.25, 'relative': False},
+    domain = {'row': 1, 'column': 0}))
+
+indicators_ptf.add_trace(go.Indicator(
+    mode = "number+delta",
+    value = 0.3,
+    number = {'suffix': " %"},
+    title = {"text": "<span style='font-size:0.7em;color:gray'>30 Days</span>"},
+    delta = {'position': "bottom", 'reference': 0.25, 'relative': False},
+    domain = {'row': 2, 'column': 0}))
+
+indicators_ptf.add_trace(go.Indicator(
+    mode = "number+delta",
+    value = 2,
+    number = {'suffix': " %"},
+    title = {"text": "<span style='font-size:0.7em;color:gray'>200 Days</span>"},
+    delta = {'position': "bottom", 'reference': 1.5, 'relative': False},
+    domain = {'row': 3, 'column': 1}))
+
+indicators_ptf.update_layout(
+    grid = {'rows': 4, 'columns': 1, 'pattern': "independent"},
+    margin=dict(l=50, r=50, t=30, b=30)
+)
+
+indicators_sp500 = go.Figure()
+indicators_sp500.add_trace(go.Indicator(
+    mode = "number+delta",
+    value = 0.2,
+    number = {'suffix': " %"},
+    title = {"text": "<br><span style='font-size:0.7em;color:gray'>7 Days</span>"},
+    domain = {'row': 0, 'column': 0}))
+
+indicators_sp500.add_trace(go.Indicator(
+    mode = "number+delta",
+    value = 0.25,
+    number = {'suffix': " %"},
+    title = {"text": "<span style='font-size:0.7em;color:gray'>15 Days</span>"},
+    domain = {'row': 1, 'column': 0}))
+
+indicators_sp500.add_trace(go.Indicator(
+    mode = "number+delta",
+    value = 0.25,
+    number = {'suffix': " %"},
+    title = {"text": "<span style='font-size:0.7em;color:gray'>30 Days</span>"},
+    domain = {'row': 2, 'column': 0}))
+
+indicators_sp500.add_trace(go.Indicator(
+    mode = "number+delta",
+    value = 1.5,
+    number = {'suffix': " %"},
+    title = {"text": "<span style='font-size:0.7em;color:gray'>200 Days</span>"},
+    domain = {'row': 3, 'column': 1}))
+
+indicators_sp500.update_layout(
+    grid = {'rows': 4, 'columns': 1, 'pattern': "independent"},
+    margin=dict(l=50, r=50, t=30, b=30)
+)
+
 # Define the layout for this page
 layout = dbc.Container([
     #Title
@@ -84,10 +167,26 @@ layout = dbc.Container([
     ], md=6),
 
     #cumulative return graoh
-    dbc.Col(dcc.Graph(id='overall-returns-graph'), width=12),
+    dbc.Col(dcc.Graph(id='overall-returns-graph'), width={'size': 8, 'offset': 0, 'order': 1}),
 
-    #summary table
-    dbc.Col(dash_table.DataTable(id='summary-table'), width=12),
+
+    dbc.Col([  # second column on second row
+            html.H5('Portfolio', className='text-center'),
+            dcc.Graph(id='indicators-ptf',
+                      figure=indicators_ptf,
+                      style={'height':550}),
+            html.Hr()
+            ], width={'size': 2, 'offset': 0, 'order': 2}),  # width second column on second row
+            dbc.Col([  # third column on second row
+            html.H5('S&P500', className='text-center'),
+            dcc.Graph(id='indicators-sp',
+                      figure=indicators_sp500,
+                      style={'height':550}),
+            html.Hr()
+            ], width={'size': 2, 'offset': 0, 'order': 3})
+,
+    
+    
     ],className="rounded-box"),
 
 
@@ -136,7 +235,8 @@ def update_returns_graph(start_date, end_date):
         x='date',
         y='cumulative_return',
         title='Cumulative Returns Over Time',
-        labels={'cumulative_returns': 'Cumulative Returns', 'date': 'Date'}
+        labels={'cumulative_returns': 'Cumulative Returns', 'date': 'Date'},
+        height=700
     )
     
     fig.update_layout(xaxis_title='Date', yaxis_title='Cumulative Returns', xaxis=dict(tickformat='%Y-%m-%d'))
